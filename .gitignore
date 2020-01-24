@@ -44,13 +44,13 @@ packrat/src/
 *.csv
 
 # explicitly allow all files in data (by default)
-!data/*
+!data/**/*
 
 # allow all files in documents (by default)
-!documents/*
+!documents/**/*
 
 # allow all files in presentations (by default)
-!presentations/*
+!presentations/**/*
 
 # allow all files in docs
-!docs/*
+!docs/**/*
