@@ -1,5 +1,6 @@
 ---
 title: "Rendered notebooks"
+subtitle: "Log: [docs.Rmd](docs.html)"
 output: html_document
 ---
 
@@ -32,15 +33,14 @@ if (file.exists(hash_file)) {
         sprintf("<font color = 'green'>This notebook was rendered successfully on %s.</font>", last_success)),
       last_fail = ifelse(
         !is.na(last_fail), 
-        sprintf("<font color = 'red'>This notebook failed to render at the latest attempt on %s.</font>", last_fail),
+        sprintf("<font color = 'red'>This notebook failed to render at the latest attempt on %s (see <a href='docs.html'>rendering log</a> for details).</font>", last_fail),
         ""
       )
     )
   docs_files %>% 
-    with(sprintf("## [%s](%s)\n\n%s\n\n%s", source_file, doc_file, last_success, last_fail)) %>% 
+    with(sprintf("## %d. [%s](%s)\n\n%s\n\n%s", 1:length(source_file), source_file, doc_file, last_success, last_fail)) %>% 
     cat(sep = "\n\n")
 } else {
   cat("No documents available yet.")
 }
 ```
-
