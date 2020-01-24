@@ -1,2 +1,3 @@
-# project_template
-Project template for data analysis in the Kopf lab
+# Template
+
+This is a project template.

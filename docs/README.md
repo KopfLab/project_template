@@ -1,0 +1,5 @@
+# docs
+
+This directory is exposed to the public web (if you want to) at http://www.kopflab.org/repository_name/ through GitHub pages. To enable this, go to your repository settings and scroll down to `Github Pages` and select `master branch /docs folder` in the `Source` dropdown. After a few seconds it should show a message stating that `Your site is ready to be published at ...`.
+
+The files in this folder (`docs`) are typically NOT edited manually. This folder usually holds rendered versions (= HTML files) of all your RMarkdown and jupyter notebooks files. These can be generated/updated by knitting the `docs.Rmd` markdown file in this folder. Rendered files are only (re)generated if they do not yet exist or if the source notebook that created them has changed in any way. If you want to force regeneration of a rendered HTML file, simply delete it from this directory and re-knit the `docs.Rmd` markdown file.

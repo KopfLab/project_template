@@ -1,0 +1,46 @@
+---
+title: "Rendered notebooks"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+
+# knitting options
+knitr::opts_knit$set(root.dir = "..")
+
+# set if a python virtual environment should be activated for jupyter notebooks
+py_venv <- NULL # e.g. py_venv <- "my_env"
+
+# output folders
+docs_folder <- "docs"
+
+# hash info file
+hash_file <- file.path(docs_folder, ".docs_hash.csv")
+```
+
+
+```{r, results='asis', echo=FALSE}
+if (file.exists(hash_file)) {
+  docs_files <- 
+    read_csv(hash_file, col_types = "cccccc") %>% 
+    mutate(
+      doc_file = str_remove(doc_file, fixed(file.path(docs_folder, ""))),
+      last_success = ifelse(
+        is.na(last_success), 
+        "This notebook has not yet been rendered succesfully!", 
+        sprintf("<font color = 'green'>This notebook was rendered successfully on %s.</font>", last_success)),
+      last_fail = ifelse(
+        !is.na(last_fail), 
+        sprintf("<font color = 'red'>This notebook failed to render at the latest attempt on %s.</font>", last_fail),
+        ""
+      )
+    )
+  docs_files %>% 
+    with(sprintf("## [%s](%s)\n\n%s\n\n%s", source_file, doc_file, last_success, last_fail)) %>% 
+    cat(sep = "\n\n")
+} else {
+  cat("No documents available yet.")
+}
+```
+
