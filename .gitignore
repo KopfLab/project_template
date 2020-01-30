@@ -1,5 +1,28 @@
 # GIT ignore commands for the entire project
 
+# exclude output files
+*.pdf
+*.html
+*.png
+*.jpeg
+*.jpg
+*.pptx
+*.docx
+*.xlsx
+*.csv
+
+# explicitly allow all files in data (by default)
+!data/**/*
+
+# allow all files in documents (by default)
+!documents/**/*
+
+# allow all files in presentations (by default)
+!presentations/**/*
+
+# allow all files in docs
+!docs/**/*
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -31,26 +54,3 @@ packrat/src/
 
 # exclude cache
 *cache/*
-
-# exclude output files
-*.pdf
-*.html
-*.png
-*.jpeg
-*.jpg
-*.pptx
-*.docx
-*.xlsx
-*.csv
-
-# explicitly allow all files in data (by default)
-!data/**/*
-
-# allow all files in documents (by default)
-!documents/**/*
-
-# allow all files in presentations (by default)
-!presentations/**/*
-
-# allow all files in docs
-!docs/**/*
