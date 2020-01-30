@@ -1,5 +1,5 @@
 ---
-title: "Generate docs"
+title: "`docs` generation log"
 output: 
   html_document:
     toc: yes
@@ -14,6 +14,9 @@ library(tidyverse)
 # knitting options
 knitr::opts_chunk$set(comment = "")
 knitr::opts_knit$set(root.dir = "..")
+
+# flag whether to always regenerate all reports even if they have not changed
+always_regenerate <- FALSE
 
 # set if a python virtual environment should be activated for jupyter notebooks
 py_venv <- NULL # e.g. py_venv <- "my_env"
@@ -86,6 +89,7 @@ docs_files <-
     # d) it has never been succesfully generated
     # e) the file does not exist although it should be there
     generate = 
+      always_regenerate | 
       is.na(existing_source_file_hash) | 
       !map2_lgl(source_file_hash, existing_source_file_hash, identical) |
       !is.na(last_fail) |
@@ -114,7 +118,7 @@ find_cmd <- function(cmd) {
 # rendering functions return system2 captured output
 render_rmd <- function(source_file, doc_file) {
   # works more reliably as an external command instead of triggering from within this knit itself
-  cmd <- find_cmd("Rscript", "Rscript.exe")
+  cmd <- find_cmd(c("Rscript", "Rscript.exe"))
   args <- sprintf("-e \"rmarkdown::render('%s', output_file = '%s', output_format = 'html_document')\"", source_file, doc_file)
   suppressWarnings(system2(cmd, args = args, stdout = TRUE, stderr = TRUE))
 }   
@@ -124,7 +128,7 @@ render_nb <- function(source_file, target_folder) {
   nbconvert_arg <- 
     sprintf("nbconvert --to html --execute \"%s\" --output-dir \"%s\"", 
             source_file, target_folder)
-  jupyter_cmd <- find_cmd("jupyter", "jupyter.exe")
+  jupyter_cmd <- find_cmd(c("jupyter", "jupyter.exe"))
   if (!is.null(py_venv)) {
     # not soure how to deal with this on Windows since source is a script, not an OS command...
     cmd <- "source"
