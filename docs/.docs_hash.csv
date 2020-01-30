@@ -1,3 +1,3 @@
 type,source_file,doc_file,source_file_hash,last_success,last_fail
-RMarkdown,template.Rmd,docs/rmarkdown/template.html,f6daa33eda4d8920f18986dc4282e12e,2020-01-24 07:59:30 MST,NA
+RMarkdown,template.Rmd,docs/rmarkdown/template.html,1fc6255060ea22131c557d5a0968c980,2020-01-24 10:50:41 MST,NA
 Jupyter NB,template.ipynb,docs/jupyter/template.html,1f540f6e00c7833de8b03183f5d74ce8,2020-01-24 00:55:39 MST,NA
