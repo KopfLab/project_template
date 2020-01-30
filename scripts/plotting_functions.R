@@ -51,7 +51,7 @@ latex_labeller <- function(labels, ...) {
   
   # figure out if we're in a scale or facet labeller
   facet_labels <- is(labels, "data.frame")
-  if (!facet_labels) labels <- data_frame(..x.. = as.character(labels))
+  if (!facet_labels) labels <- tibble(..x.. = as.character(labels))
   
   # gather labels
   labels <- labels %>% 
