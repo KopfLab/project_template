@@ -2909,6 +2909,19 @@ div.tocify {
 </div>
 
 
+<pre class="r"><code># load libraries
+library(tidyverse) 
+library(latex2exp)
+
+# source all relevant scripting files
+source(file.path(&quot;scripts&quot;, &quot;plotting_functions.R&quot;))
+
+# global knitting options for automatic saving of all plots as .png and .pdf
+knitr::opts_chunk$set(
+  dev = c(&quot;png&quot;, &quot;pdf&quot;), fig.keep = &quot;all&quot;,
+  dev.args = list(pdf = list(encoding = &quot;WinAnsi&quot;, useDingbats = FALSE)),
+  fig.path = file.path(&quot;fig_output&quot;, paste0(gsub(&quot;\\.[Rr]md&quot;, &quot;&quot;, knitr::current_input()), &quot;_&quot;))
+)</code></pre>
 <div id="latex-math" class="section level1">
 <h1><span class="header-section-number">1</span> <span class="math inline">\(\LaTeX\)</span> Math</h1>
 <p>This is just markdown that can include latex math.</p>

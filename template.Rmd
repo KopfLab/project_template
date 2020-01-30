@@ -16,7 +16,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
+```{r setup, echo = TRUE, message=FALSE, warning=FALSE}
 # load libraries
 library(tidyverse) 
 library(latex2exp)
