@@ -10,9 +10,6 @@ library(tidyverse)
 # knitting options
 knitr::opts_knit$set(root.dir = "..")
 
-# set if a python virtual environment should be activated for jupyter notebooks
-py_venv <- NULL # e.g. py_venv <- "my_env"
-
 # output folders
 docs_folder <- "docs"
 
@@ -26,6 +23,7 @@ if (file.exists(hash_file)) {
   docs_files <- 
     read_csv(hash_file, col_types = "cccccc") %>% 
     mutate(
+      source_copy = str_remove(file.path(dirname(doc_file), source_file), fixed(file.path(docs_folder, ""))),
       doc_file = str_remove(doc_file, fixed(file.path(docs_folder, ""))),
       last_success = ifelse(
         is.na(last_success), 
@@ -38,7 +36,9 @@ if (file.exists(hash_file)) {
       )
     )
   docs_files %>% 
-    with(sprintf("## %d. [%s](%s)\n\n%s\n\n%s", 1:length(source_file), source_file, doc_file, last_success, last_fail)) %>% 
+    with(sprintf("## %d. [%s](%s) ([source](%s))\n\n%s\n\n%s", 
+                 1:length(source_file), source_file, doc_file, 
+                 source_copy, last_success, last_fail)) %>% 
     cat(sep = "\n\n")
 } else {
   cat("No documents available yet.")

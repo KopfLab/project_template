@@ -1,0 +1,88 @@
+---
+title: "Template"
+subtitle: "SUBTITLE"
+author: "AUTHORS"
+date: "`r format(Sys.Date(), '%d %b %Y')`"
+output:
+  html_document: 
+    df_print: paged
+    css: stylesheet.css
+    number_sections: yes
+    toc: yes
+    toc_float: true
+    toc_depth: 3
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, echo = TRUE, message=FALSE, warning=FALSE}
+# load libraries
+library(tidyverse) 
+library(latex2exp)
+
+# source all relevant scripting files
+source(file.path("scripts", "plotting_functions.R"))
+
+# global knitting options for automatic saving of all plots as .png and .pdf
+knitr::opts_chunk$set(
+  dev = c("png", "pdf"), fig.keep = "all",
+  dev.args = list(pdf = list(encoding = "WinAnsi", useDingbats = FALSE)),
+  fig.path = file.path("fig_output", paste0(gsub("\\.[Rr]md", "", knitr::current_input()), "_"))
+)
+```
+
+# $\LaTeX$ Math
+
+This is just markdown that can include latex math.
+
+$$
+\begin{align}
+\dot{x} & = \sigma(y-x) \\
+\dot{y} & = \rho x - y - xz \\
+\dot{z} & = -\beta z + xy
+\end{align}
+$$
+
+# Data Table
+
+```{r}
+as_tibble(iris)
+```
+
+# Export Data
+
+```{r}
+iris %>% openxlsx::write.xlsx(file.path("data_output", "iris_dataset.xlsx"))
+```
+
+# Simple Plot
+
+```{r "simple_plot", fig.width = 8, fig.height = 6}
+iris %>% 
+  ggplot() +
+  aes(x = Sepal.Length, y = Sepal.Width, color = Species) + 
+  geom_point()
+```
+
+# Polished Plot
+
+```{r "polished_plot", warning=FALSE, fig.width = 8, fig.height = 6}
+iris %>% 
+  mutate(
+    latex_species = as_factor(Species) %>% 
+      fct_recode(
+        "$\\left(\\frac{\\textbf{setsoa}}{\\beta^2}\\right)$" = "setosa",
+        "$\\int_{\\infinity}\\sqrt[2]_{\\textbf{versicolor}}$" = "versicolor")
+  ) %>% 
+  ggplot() + 
+  aes(Sepal.Length, Sepal.Width, color = latex_species) + 
+  geom_point() +
+  scale_color_discrete(labels = latex_labeller) +
+  facet_wrap(~latex_species, labeller = latex_labeller) +
+  labs(x = TeX("my x axis $\\delta^{42}X\\,\\[\U2030\\]$")) + 
+  theme_figure(text_size = 16)
+```
+
+
+

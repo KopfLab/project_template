@@ -147,6 +147,9 @@ render_file <- function(generate, type, source_file, target_folder, doc_file) {
     return(NA)
   }
   
+  # copy source file
+  file.copy(source_file, to = target_folder, overwrite = TRUE)
+  
   # render
   if (type == "RMarkdown")
     out <- render_rmd(source_file = source_file, doc_file = doc_file)
