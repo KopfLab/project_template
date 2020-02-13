@@ -2,10 +2,13 @@
 title: "`docs` generation log"
 output: 
   html_document:
+    css: stylesheet.css
     toc: yes
     toc_float: true
     toc_depth: 3
     code_folding: hide
+editor_options:
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}

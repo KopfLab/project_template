@@ -1,8 +1,18 @@
 ---
-title: "Rendered notebooks"
-subtitle: "Log: [docs.Rmd](docs.html)"
-output: html_document
+title: "Project name"
+author: "Author: "
+output:
+  html_document: 
+    css: stylesheet.css
+    number_sections: yes
+    toc: yes
+    toc_float: true
+    toc_depth: 3
+editor_options:
+  chunk_output_type: console
 ---
+
+# Notebooks
 
 ```{r setup, include=FALSE}
 library(tidyverse)
@@ -36,8 +46,8 @@ if (file.exists(hash_file)) {
       )
     )
   docs_files %>% 
-    with(sprintf("## %d. [%s](%s) ([source](%s))\n\n%s\n\n%s", 
-                 1:length(source_file), source_file, doc_file, 
+    with(sprintf("## [%s](%s) ([source](%s))\n\n%s\n\n%s", 
+                 source_file, doc_file, 
                  source_copy, last_success, last_fail)) %>% 
     cat(sep = "\n\n")
 } else {

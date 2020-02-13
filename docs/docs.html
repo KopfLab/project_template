@@ -1387,6 +1387,55 @@ h6 {
 }
 </style>
 
+<style type="text/css">
+body{ 
+font-size: 14px;
+}
+h1 { font-size: 24px;
+color: DarkBlue;
+}
+h2 { font-size: 18px;
+color: DarkBlue;
+}
+h3 { font-size: 16px;
+font-style: serif;
+color: DarkBlue;
+}
+code.r{ font-size: 12px;
+}
+
+table {
+padding: 0;
+}
+table tr {
+border-top: 1px solid #cccccc;
+background-color: white;
+margin: 0;
+padding: 0;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+table tr th {
+font-weight: bold;
+border: 1px solid #cccccc;
+text-align: left;
+margin: 0;
+padding: 6px 13px;
+}
+table tr td {
+border: 1px solid #cccccc;
+text-align: left;
+margin: 0;
+padding: 6px 13px;
+}
+table tr th :first-child, table tr td :first-child {
+margin-top: 0;
+}
+table tr th :last-child, table tr td :last-child {
+margin-bottom: 0;
+}
+</style>
 
 
 
@@ -1667,7 +1716,7 @@ docs_files %&gt;% select(-target_folder) %&gt;% knitr::kable()</code></pre>
 <td align="left">template.Rmd</td>
 <td align="left">docs/rmarkdown/template.html</td>
 <td align="left">1fc6255060ea22131c557d5a0968c980</td>
-<td align="left">2020-01-29 21:12:43 MST</td>
+<td align="left">2020-02-13 01:28:42 MST</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
@@ -1676,7 +1725,7 @@ docs_files %&gt;% select(-target_folder) %&gt;% knitr::kable()</code></pre>
 <td align="left">template.ipynb</td>
 <td align="left">docs/jupyter/template.html</td>
 <td align="left">1f540f6e00c7833de8b03183f5d74ce8</td>
-<td align="left">2020-01-29 21:12:43 MST</td>
+<td align="left">2020-02-13 01:28:42 MST</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
@@ -1845,7 +1894,7 @@ List of 3
 
 output file: template.knit.md
 
-/Applications/RStudio.app/Contents/MacOS/pandoc/pandoc +RTS -K512m -RTS template.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash+smart --output docs/rmarkdown/template.html --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --css stylesheet.css --variable 'theme:bootstrap' --include-in-header /var/folders/8z/hxk97xk1763cz5crb3wp7h840000gn/T//RtmpPdTOAC/rmarkdown-str16ef96ce5389d.html --mathjax --variable 'mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --lua-filter /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/lua/latex-div.lua --variable code_folding=show --variable code_menu=1 
+/Applications/RStudio.app/Contents/MacOS/pandoc/pandoc +RTS -K512m -RTS template.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash+smart --output docs/rmarkdown/template.html --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --number-sections --css stylesheet.css --variable 'theme:bootstrap' --include-in-header /var/folders/8z/hxk97xk1763cz5crb3wp7h840000gn/T//RtmpWtalzP/rmarkdown-str1796079b3583d.html --mathjax --variable 'mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --lua-filter /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rmarkdown/rmd/lua/latex-div.lua --variable code_folding=show --variable code_menu=1 
 
 Output created: docs/rmarkdown/template.html
 There were 50 or more warnings (use warnings() to see the first 50)</code></pre>
@@ -1890,7 +1939,7 @@ summary %&gt;% knitr::kable()</code></pre>
 <td align="left">template.Rmd</td>
 <td align="left">docs/rmarkdown/template.html</td>
 <td align="left">1fc6255060ea22131c557d5a0968c980</td>
-<td align="left">2020-02-13 01:28:42 MST</td>
+<td align="left">2020-02-13 02:04:20 MST</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 <td align="left">TRUE</td>
@@ -1900,7 +1949,7 @@ summary %&gt;% knitr::kable()</code></pre>
 <td align="left">template.ipynb</td>
 <td align="left">docs/jupyter/template.html</td>
 <td align="left">1f540f6e00c7833de8b03183f5d74ce8</td>
-<td align="left">2020-02-13 01:28:42 MST</td>
+<td align="left">2020-02-13 02:04:20 MST</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 <td align="left">TRUE</td>
