@@ -1,6 +1,8 @@
 # GIT ignore commands for the entire project
 
 # exclude output files
+*.rds
+*.rda
 *.pdf
 *.html
 *.png
