@@ -1,6 +1,6 @@
 ---
-title: "Template"
-subtitle: "SUBTITLE"
+title: "Example"
+subtitle: "Demonstrates latex math, data tables, Excel export and import, and plotting"
 author: "AUTHORS"
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output:
@@ -15,6 +15,15 @@ output:
 editor_options:
   chunk_output_type: console
 ---
+
+```{r install, eval=FALSE}
+# run this block once in RStudio to install all packages required for this example
+install.packages("tidyverse") # tidyverse data and plotting tools
+install.packages("readxl") # reading excel files
+install.packages("openxlsx") # writing excel files
+install.packages("latex2exp") # rendering latex equations in plots
+```
+
 
 ```{r setup, echo = TRUE, message=FALSE, warning=FALSE}
 # load libraries
@@ -47,40 +56,59 @@ $$
 # Data Table
 
 ```{r}
-as_tibble(iris)
+# show a data table (this miles-per-gallon dataset is included with ggplot2)
+mpg
 ```
 
 # Export Data
 
 ```{r}
-iris %>% openxlsx::write.xlsx(file.path("data_output", "iris_dataset.xlsx"))
+# export the data table to excel
+mpg %>% openxlsx::write.xlsx("data_output/mpg_dataset.xlsx")
+```
+
+# Re-import the Data
+
+
+```{r}
+# re-import from Excel
+mpg <- readxl::read_excel("data_output/mpg_dataset.xlsx")
 ```
 
 # Simple Plot
 
 ```{r "simple_plot", fig.width = 8, fig.height = 6}
-iris %>% 
+# generate a simple plot with ggplot2
+mpg %>% 
   ggplot() +
-  aes(x = Sepal.Length, y = Sepal.Width, color = Species) + 
+  aes(x = hwy, y = cty, color = drv) + 
   geom_point()
 ```
 
 # Polished Plot
 
 ```{r "polished_plot", warning=FALSE, fig.width = 8, fig.height = 6}
-iris %>% 
+# generate a more polished plot
+mpg %>% 
+  # upgrade the color scale to include some latex symbols
   mutate(
-    latex_species = as_factor(Species) %>% 
+    latex_drv = 
+      # turn into ordered variable (factor) that keeps the order
+      as_factor(drv) %>% fct_inorder() %>% 
+      # introduce latex substitutions
       fct_recode(
-        "$\\left(\\frac{\\textbf{setsoa}}{\\beta^2}\\right)$" = "setosa",
-        "$\\int_{\\infinity}\\sqrt[2]_{\\textbf{versicolor}}$" = "versicolor")
+        "$\\left(\\frac{\\textbf{rear drv}}{\\beta^2}\\right)$" = "r",
+        "$\\int_{\\infinity}\\sqrt[2]_{\\textbf{front drv}}$" = "f")
   ) %>% 
+  # start the plot
   ggplot() + 
-  aes(Sepal.Length, Sepal.Width, color = latex_species) + 
+  aes(x = hwy, y = cty, color = latex_drv) + 
   geom_point() +
+  # add latex to color, facet and axis labels
   scale_color_discrete(labels = latex_labeller) +
-  facet_wrap(~latex_species, labeller = latex_labeller) +
+  facet_wrap(~latex_drv, labeller = latex_labeller) +
   labs(x = TeX("my x axis $\\delta^{42}X\\,\\[\U2030\\]$")) + 
+  # use theme_figure from the plotting_functions.R
   theme_figure(text_size = 16)
 ```
 

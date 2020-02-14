@@ -1,3 +1,2 @@
-type,source_file,doc_file,source_file_hash,last_success,last_fail
-RMarkdown,template.Rmd,docs/rmarkdown/template.html,1fc6255060ea22131c557d5a0968c980,2020-02-13 02:04:20 MST,NA
-Jupyter NB,template.ipynb,docs/jupyter/template.html,1f540f6e00c7833de8b03183f5d74ce8,2020-02-13 02:04:20 MST,NA
+type,source_file,source_copy,source_file_hash,doc_file,last_success,last_fail
+RMarkdown,example.Rmd,docs/rmarkdown/example.Rmd,4f70000e1654766a9eeb97ebcf1f0c89,docs/rmarkdown/example.html,2020-02-14 11:21:08 MST,NA

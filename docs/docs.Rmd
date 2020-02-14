@@ -58,10 +58,12 @@ nb_files <- tibble(
 docs_files <- 
   bind_rows(rmd_files, nb_files) %>% 
   mutate(
-    doc_file = 
-      file.path(target_folder, str_replace(source_file, "\\.[^.]+$", ".html")),
-    source_file_hash = tools::md5sum(source_file)
-  ) 
+    source_copy = file.path(target_folder, source_file),
+    source_file_hash = tools::md5sum(source_file),
+    doc_file = str_replace(source_copy, "\\.[^.]+$", ".html")
+  ) %>% 
+  # exclude template files
+  filter(!source_file %in% c("template.Rmd", "template.ipynb"))
 
 # docs hash
 if (file.exists(hash_file)) {
@@ -70,8 +72,9 @@ if (file.exists(hash_file)) {
   docs_hash <- tibble(
     type = character(),
     source_file = character(),
-    doc_file = character(),
+    source_copy = character(),
     source_file_hash = character(),
+    doc_file = character(),
     last_success = character(),
     last_fail = character()
   )
@@ -81,8 +84,8 @@ if (file.exists(hash_file)) {
 docs_files <- 
   docs_files %>% 
   left_join(
-    rename(docs_hash, existing_source_file_hash = source_file_hash) %>% select(-source_file), 
-    by = c("doc_file", "type")
+    rename(docs_hash, existing_source_file_hash = source_file_hash), 
+    by = c("source_file", "source_copy", "doc_file", "type")
   ) %>% 
   mutate(
     # generate if
