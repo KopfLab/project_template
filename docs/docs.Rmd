@@ -2,7 +2,6 @@
 title: "`docs` generation log"
 output: 
   html_document:
-    css: stylesheet.css
     toc: yes
     toc_float: true
     toc_depth: 3
@@ -67,7 +66,7 @@ docs_files <-
 
 # docs hash
 if (file.exists(hash_file)) {
-  docs_hash <- read_csv(hash_file, col_types = "cccccc")
+  docs_hash <- read_csv(hash_file, col_types = "ccccccc")
 } else {
   docs_hash <- tibble(
     type = character(),
@@ -145,7 +144,7 @@ render_nb <- function(source_file, target_folder) {
   }
   suppressWarnings(system2(cmd, args = args, stdout = TRUE, stderr = TRUE))
 }
-render_file <- function(generate, type, source_file, target_folder, doc_file) {
+render_file <- function(generate, type, source_file, source_copy, target_folder, doc_file) {
   
   if (!generate) {
     cat("<h1>", source_file, " (NC)</h1>\n")
@@ -153,8 +152,11 @@ render_file <- function(generate, type, source_file, target_folder, doc_file) {
     return(NA)
   }
   
-  # copy source file
-  file.copy(source_file, to = target_folder, overwrite = TRUE)
+  # copy source file with extra md header to account for jekyll
+  # stripping it out when generating the github page
+  if (file.exists(source_copy)) file.remove(source_copy)
+  write("---\n---", file = source_copy)
+  file.append(source_copy, source_file)
   
   # render
   if (type == "RMarkdown")
@@ -184,6 +186,7 @@ rendered_doc_files <- docs_files %>%
       generate = generate,
       type = type,
       source_file = source_file,
+      source_copy = source_copy,
       target_folder = target_folder,
       doc_file = doc_file
     ),

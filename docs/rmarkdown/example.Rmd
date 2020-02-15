@@ -8,7 +8,6 @@ date: "`r format(Sys.Date(), '%d %b %Y')`"
 output:
   html_document: 
     df_print: paged
-    css: stylesheet.css
     number_sections: yes
     toc: yes
     toc_float: true
