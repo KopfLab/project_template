@@ -1,2 +1,2 @@
 type,source_file,source_copy,source_file_hash,doc_file,last_success,last_fail
-RMarkdown,example.Rmd,docs/rmarkdown/example.Rmd,858042f94f55f59f5e1c23d40a6c979e,docs/rmarkdown/example.html,2020-02-14 23:32:03 MST,NA
+RMarkdown,example.Rmd,docs/rmarkdown/example.Rmd,9855fcbc14c1b9dee394b39e50fd53ee,docs/rmarkdown/example.html,2020-02-17 00:37:06 MST,NA
