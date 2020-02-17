@@ -1,5 +1,6 @@
 ---
 title: "Project name"
+subtitle: "Log: [docs.Rmd](docs.html)"
 author: "Author: "
 output:
   html_document: 
@@ -10,6 +11,13 @@ output:
 editor_options:
   chunk_output_type: console
 ---
+
+<!-- change background color of active menu items so links are still visible -->
+<style>
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+  background-color: #B8B9BA;
+}
+</style>
 
 # Notebooks
 
