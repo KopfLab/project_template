@@ -7,14 +7,15 @@ author: "AUTHORS"
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output:
   html_document: 
-    df_print: paged
-    number_sections: yes
-    toc: yes
-    toc_float: true
-    toc_depth: 3
-    code_folding: show
+    df_print: paged # omit to disable paged data table output
+    stylesheet: stylesheet.css # omit if no need for custom stylesheet
+    number_sections: yes # change to no for unnumbered sections
+    toc: yes # change to no to disable table of contents
+    toc_float: true # change to false to keep toc at the top
+    toc_depth: 3 # change to specify which headings to include in toc
+    code_folding: show # change to hide to hide code by default
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: console # change to inline to show output inline
 ---
 
 ```{r install, eval=FALSE}
