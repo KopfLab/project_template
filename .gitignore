@@ -13,8 +13,8 @@
 *.xlsx
 *.csv
 
-# explicitly allow all files in data (by default)
-!data/**/*
+# explicitly allow all files in data_raw (by default)
+!data_raw/**/*
 
 # allow all files in documents (by default)
 !documents/**/*
