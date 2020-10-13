@@ -38,6 +38,34 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
   return(the_theme)
 }
 
+#' Format number with significant digits
+#' 
+#' This is useful for including numbers on plots as text elements.
+#' 
+#' @param signif number of significant digits
+#' @param sci_notation cutoff when to start using scientific notation
+#' @param sci_as_latex scientific notiation as latex
+#' @param include_plus whether to include plus sign
+#' @return textual representation of the number matching the parameter settings
+format_with_signif <- function(x, signif = 2, sci_notation = 1e-5, sci_as_latex = FALSE, include_plus = FALSE) {
+  if(signif <= 0) stop("this function only supports numbers with at least 1 significant digit")
+  x <- base::signif(x, digits = signif)
+  n_decimals = ifelse(x == 0, 0, log10(abs(x)))
+  n_decimals = ifelse(
+    n_decimals < 0,
+    -floor(n_decimals) + signif - 1L,
+    -ceiling(n_decimals) + signif
+  )
+  plus <- if(include_plus) "+" else ""
+  pow <- if(sci_as_latex) "\\\\cdot{}10^{-%.0f}" else "e-%.0f"
+  ifelse(
+    abs(x) > sci_notation,
+    sprintf(sprintf("%%%s.%0.ff", plus, n_decimals), x),
+    sprintf(sprintf("%%%s.%0.ff%s", plus, signif - 1L, pow), 
+            x * 10^(n_decimals - signif + 1L), (n_decimals - signif + 1L))
+  )
+}
+
 #' Latex labeller
 #' 
 #' Latex labeller for ggplot that will interpret latex equations correctly (i.e. anything between $$). 
