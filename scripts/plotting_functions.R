@@ -58,6 +58,7 @@ format_with_signif <- function(x, signif = 2, no_sci_min = 1e-5, no_sci_max = 1e
   n_decimals <- ifelse(exact, n_decimals, floor(n_decimals))
   # use same decimals for true 0 as the smallest abs(x)
   zeros <- abs(x) < .Machine$double.eps^0.5
+  zeros[is.na(zeros)] <- FALSE
   if (any(zeros)) {
     min_decimals <- min(n_decimals[!zeros], na.rm = TRUE)
     n_decimals <- ifelse(zeros, min_decimals, n_decimals)
