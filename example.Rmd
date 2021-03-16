@@ -85,9 +85,11 @@ mpg %>%
   geom_point()
 ```
 
-# Polished Plot
+# Polished Plots
 
-```{r "polished_plot", warning=FALSE, fig.width = 8, fig.height = 6}
+## Latex labels
+
+```{r "polished_plot_w_latex_labels", warning=FALSE, fig.width = 8, fig.height = 6}
 # generate a more polished plot
 mpg %>% 
   # upgrade the color scale to include some latex symbols
@@ -113,4 +115,32 @@ mpg %>%
 ```
 
 
+## Log axis formatting
+
+```{r "polished_plot_w_formatted_log_axis", warning=FALSE, fig.width = 8, fig.height = 4}
+diamonds %>%
+  slice_sample(n = 1000) %>%
+  ggplot() +
+  aes(x = carat, y = price, color = cut) +
+  geom_point() + 
+  scale_y_continuous(labels = parsed_sci_format(signif = 2)) +
+  theme_figure(text_size = 16)
+```
+
+## Y axis break
+
+```{r "polished_plot_w_y_axis_break", warning=FALSE, fig.width = 8, fig.height = 4}
+p <- diamonds %>%
+  slice_sample(n = 1000) %>%
+  ggplot() +
+  aes(x = carat, y = price, color = cut) +
+  geom_point() + 
+  theme_figure(text_size = 16, legend = FALSE)
+
+plot_with_y_gap(
+  pb = p, pb_ylim = c(0, 1100), pb_breaks = c(0, 250, 500, 750, 1000),
+  pt = p, pt_ylim = c(9000, 16000), pt_breaks = c(10000, 12500, 15000),
+  pb_gap_marker_offset = 0.02, pt_gap_marker_offset = 0.03
+)
+```
 
