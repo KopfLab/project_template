@@ -38,44 +38,6 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
   return(the_theme)
 }
 
-#' Format number with significant digits
-#' 
-#' This is useful for including numbers on plots as text elements.
-#' 
-#' @param signif number of significant digits to display
-#' @param no_sci_min use scientific notation for abs(x)<=no_sci_min, only used if always_sci = FALSE
-#' @param no_sci_max use scientific notation for abs(x)>=no_sci_max, only used if always_sci = FALSE
-#' @param alawys_sci set to TRUE to always use scientific notation
-#' @param sci_as_latex whether to print scientific notation as latex
-#' @param include_plus whether to include plus sign for positive numbers (x>0)
-#' @return textual representation of the number matching the parameter settings
-format_with_signif <- function(x, signif = 2, no_sci_min = 1e-5, no_sci_max = 1e5, always_sci = FALSE, sci_as_latex = FALSE, include_plus = FALSE) {
-  if(signif <= 0) stop("this function only supports numbers with at least 1 significant digit")
-  x <- base::signif(x, digits = signif)
-  n_decimals = ifelse(x == 0, 0, log10(abs(x)))
-  # find decimals depending on whether it's an exact power of 10 or not
-  exact <- (n_decimals %% 1) < .Machine$double.eps^0.5
-  n_decimals <- ifelse(exact, n_decimals, floor(n_decimals))
-  # use same decimals for true 0 as the smallest abs(x)
-  zeros <- abs(x) < .Machine$double.eps^0.5
-  zeros[is.na(zeros)] <- FALSE
-  if (any(zeros)) {
-    min_decimals <- min(n_decimals[!zeros], na.rm = TRUE)
-    n_decimals <- ifelse(zeros, min_decimals, n_decimals)
-  }
-  # determine formatting
-  plus <- if(include_plus) "+" else ""
-  pow <- if(sci_as_latex) "\\\\cdot{}10^{%.0f}" else "e%.0f"
-  ifelse(
-    !always_sci & abs(x) > no_sci_min & abs(x) < no_sci_max,
-    # no scientific notation
-    sprintf(sprintf("%%%s.%0.ff", plus, -n_decimals), x),
-    # scientific notation
-    sprintf(sprintf("%%%s.%0.ff%s", plus, signif - 1L, pow), 
-            x * 10^(-n_decimals), n_decimals)
-  )
-}
-
 #' Parse scientific notation formatter
 #' @example 
 #' p + scale_y_continuous(labels = parsed_sci_format(signif = 3))

@@ -1,3 +1,46 @@
+#' Format number with significant digits
+#' 
+#' This is useful for including numbers on plots as text elements.
+#' 
+#' @param signif number of significant digits to display
+#' @param no_sci_min use scientific notation for abs(x)<=no_sci_min, only used if always_sci = FALSE
+#' @param no_sci_max use scientific notation for abs(x)>=no_sci_max, only used if always_sci = FALSE
+#' @param alawys_sci set to TRUE to always use scientific notation
+#' @param sci_as_latex whether to print scientific notation as latex
+#' @param include_plus whether to include plus sign for positive numbers (x>0)
+#' @param na_value what value to use for NA values
+#' @return textual representation of the number matching the parameter settings
+format_with_signif <- function(x, signif = 2, no_sci_min = 1e-5, no_sci_max = 1e5, always_sci = FALSE, sci_as_latex = FALSE, include_plus = FALSE, na_value = NA_character_) {
+  if(signif <= 0) stop("this function only supports numbers with at least 1 significant digit")
+  x <- base::signif(x, digits = signif)
+  n_decimals = ifelse(x == 0, 0, log10(abs(x)))
+  # find decimals depending on whether it's an exact power of 10 or not
+  exact <- (n_decimals %% 1) < .Machine$double.eps^0.5
+  n_decimals <- ifelse(exact, n_decimals, floor(n_decimals))
+  # use same decimals for true 0 as the smallest abs(x)
+  zeros <- abs(x) < .Machine$double.eps
+  zeros[is.na(zeros)] <- FALSE
+  if (any(zeros)) {
+    min_decimals <- min(n_decimals[!zeros], na.rm = TRUE)
+    n_decimals <- ifelse(zeros, min_decimals, n_decimals)
+  }
+  # determine formatting
+  plus <- if(include_plus) "+" else ""
+  pow <- if(sci_as_latex) "\\\\cdot{}10^{%.0f}" else "e%.0f"
+  # generate output vector
+  out <- character(length(x))
+  out[is.na(x)] <- na_value
+  # non-sci formatting
+  non_sci <- !is.na(x) & !always_sci & abs(x) > no_sci_min & abs(x) < no_sci_max 
+  out[non_sci] <- sprintf(sprintf("%%%s.%0.ff", plus, -n_decimals[non_sci] + signif - 1L), x[non_sci])
+  # sci formatting
+  sci <- !is.na(x) & !non_sci
+  out[sci] <- sprintf(sprintf("%%%s.%0.ff%s", plus, signif - 1L, pow), x[sci] * 10^(-n_decimals[sci]), n_decimals[sci])
+  # finished
+  return(out)
+}
+
+
 #' Export data frame to excel
 #'
 #' Export one or multiple data frame to an Excel file. For more fine-control, call createWorkbook and add_excel_sheet directly.
