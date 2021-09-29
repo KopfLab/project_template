@@ -1,6 +1,6 @@
 ---
-title: "Example"
-subtitle: "Demonstrates latex math, data tables, Excel export and import, and plotting"
+title: "Plotting Example"
+subtitle: "Demonstrates latex math and plotting"
 author: "AUTHORS"
 date: "`r format(Sys.Date(), '%d %b %Y')`"
 output:
@@ -19,8 +19,6 @@ editor_options:
 ```{r install, eval=FALSE}
 # run this block once in RStudio to install all packages required for this example
 install.packages("tidyverse") # tidyverse data and plotting tools
-install.packages("readxl") # reading excel files
-install.packages("openxlsx") # writing excel files
 install.packages("latex2exp") # rendering latex equations in plots
 ```
 
@@ -53,28 +51,6 @@ $$
 \dot{z} & = -\beta z + xy
 \end{align}
 $$
-
-# Data Table
-
-```{r}
-# show a data table (this miles-per-gallon dataset is included with ggplot2)
-mpg
-```
-
-# Export Data
-
-```{r}
-# export the data table to excel
-mpg %>% export_to_excel(file = "output/mpg_dataset.xlsx")
-```
-
-# Re-import the Data
-
-
-```{r}
-# re-import from Excel
-mpg <- readxl::read_excel("output/mpg_dataset.xlsx")
-```
 
 # Simple Plot
 
