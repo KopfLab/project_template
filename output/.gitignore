@@ -1,4 +1,4 @@
-# GIT ignore commands for the data_output directory
+# GIT ignore commands for the output directory
 # by default, nothing from this directory is ever added to github
 *
 

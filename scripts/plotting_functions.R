@@ -38,13 +38,15 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
   return(the_theme)
 }
 
-#' Parse scientific notation formatter
+#' Parse scientific notation formatter for plot axes
 #' @example 
 #' p + scale_y_continuous(labels = parsed_sci_format(signif = 3))
 parsed_sci_format <- function(signif = 2, include_plus = FALSE) {
   require("latex2exp")
   function(x) {
-    latex2exp::TeX(format_with_signif(x, signif = signif, always_sci = TRUE, sci_as_latex = TRUE, include_plus = include_plus))
+    tex_labels <- format_with_signif(x, signif = signif, always_sci = TRUE, sci_as_latex = TRUE, include_plus = include_plus)
+    tex_labels[is.na(tex_labels)] <- ""
+    latex2exp::TeX(tex_labels)
   }
 }
 
@@ -88,6 +90,55 @@ latex_labeller <- function(labels, ...) {
   else return(labels$..x..)
 }
 class(latex_labeller) <- c("function", "labeller")
+
+#' Generate a regression fit label to show on plots
+#'
+#' @param df the data frame - use group_by to make sure all relevant aesthetics are accounted for
+#' @param formula the regression formula
+#' @param func the regression function
+#' @param signif number of significant digits in the terms (uses format_with_signif function)
+#' @param include_r2 whether to include the adjusted R2 term
+#' @param terms_order_low_to_high whether to start with the intercept and go to higher order terms or vice versa (start with highest order term)
+#' @param ... additional parameters to the regression function
+generate_regression_fit_label <- function(df, formula, func = lm, signif = 2, include_r2 = TRUE, terms_order_low_to_high = FALSE, ...) {
+  require("dplyr")
+  require("broom")
+  require("latex2exp")
+  if(missing(formula)) stop("need a formula", call. = FALSE)
+  formula_expr <- rlang::enexpr(formula)
+  safe_func <- safely(func)
+  dots <- rlang::dots_list(...)
+  df %>%
+    group_nest(.key = "reg_data") %>%
+    mutate(
+      fit = map(reg_data, ~safe_func(formula = !!formula_expr, data = .x, !!!dots)),
+      has_error = !map_lgl(fit, ~is.null(.x$error)),
+      error_msg = map2_chr(has_error, fit, ~if(.x) { as.character(.y$error) } else { NA_character_ } ),
+      adj_r2 = map2_dbl(has_error, fit, ~if(!.x) { broom::glance(.y$result)$adj.r.squared } else { NA_real_ } ),
+      coefs = map2(has_error, fit, ~if(!.x) { 
+        coeffs <- broom::tidy(.y$result)
+        if (!terms_order_low_to_high) coeffs <- coeffs[nrow(coeffs):1,]
+        coeffs %>%
+          mutate(
+            term = str_remove_all(term, fixed("`")),
+            x_term = case_when(
+              is.na(estimate) ~ sprintf("??\\cdot\\textit{%s}", term),
+              term == "(Intercept)" ~ format_with_signif(estimate, signif = !!signif, sci_as_latex = TRUE, include_plus = TRUE),
+              TRUE ~ sprintf("%s\\cdot\\textit{%s}", format_with_signif(estimate, signif = signif, sci_as_latex = TRUE, include_plus = TRUE), term)
+            )
+          )
+      } else { NULL }),
+      y_term = sprintf("\\textit{%s}", rlang::as_label(rlang::f_lhs(!!formula_expr))),
+      x_term = map2_chr(has_error, coefs, ~if(!.x) { paste(.y$x_term, collapse = "\\,")  } else { NA_character_} ),
+      r2_term = if (include_r2) sprintf("\\,(\\textit{r}^2 = %s)", format_with_signif(adj_r2, signif = signif, sci_as_latex = TRUE)),
+      latex_label = ifelse(
+        has_error, NA_character_,
+        sprintf("$%s\\,=\\,%s%s$", y_term, x_term, r2_term)
+      ),
+      expr_label = map2_chr(latex_label, error_msg, ~as.character(latex2exp::TeX(if(!is.na(.x)) { .x } else { .y })))
+    ) %>%
+    select(-reg_data, -fit, -adj_r2, -coefs, -y_term, -x_term, -r2_term) 
+}
 
 #' @param pb_* bottom subplot parameters
 #' @param pt_* top subplot parameters
@@ -189,4 +240,3 @@ element_grob.element_y_axis_with_gap <- function(element, ...)  {
     top_grob
   )
 }
-

@@ -40,16 +40,14 @@ format_with_signif <- function(x, signif = 2, no_sci_min = 1e-5, no_sci_max = 1e
   return(out)
 }
 
-
-#' Export data frame to excel
+#' export data frame to excel
 #'
-#' Export one or multiple data frame to an Excel file. For more fine-control, call createWorkbook and add_excel_sheet directly.
+#' for more fine-control, call createWorkbook and add_excel_sheet directly.
 #'
-#' @param ... data frames to export, name arguments to get tabe names --> export_to_excel(`tab a` = df_a, `tab b` = df_b, ...)
-#' @param file file path where to save the excel file
-#' @param dbl_digits how many digits to show for numbers (NOTE: numbers are exported at full float precision, this is just for the excel styling of numbers) 
-#' @return returns the data frame invisibly for use in pipes
-export_to_excel <- function(..., file, dbl_digits = 2) {
+#' @param df data frame
+#' @param df file path to the file
+#' @return returns the data frame invisible for use in pipes
+export_to_excel <- function(..., file, dbl_digits = 2, int_format = "0", dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)) {
   # make excel workbook
   wb <- openxlsx::createWorkbook()
   
@@ -62,7 +60,7 @@ export_to_excel <- function(..., file, dbl_digits = 2) {
   purrr::walk2(
     names(sheets),
     sheets,
-    ~add_excel_sheet(wb, sheet_name = .x, .y, dbl_digits = dbl_digits)
+    ~add_excel_sheet(wb, sheet_name = .x, df = .y, dbl_digits = dbl_digits, int_format = int_format, dbl_format = dbl_format)
   )
   
   # save workbook
@@ -73,11 +71,13 @@ export_to_excel <- function(..., file, dbl_digits = 2) {
 }
 
 
-#' Add an excel sheet to a workbook
-#' @param ... the data frames
-#' @inheritParams export_to_excel
+#' add an excel sheet to a workbook
+#' @param ... the data frame(s)
+#' @param dbl_digits how many digits to show for dbls (all are exported)
+#' @param int_format the excel formatting style for integers
+#' @param dbl_format the excel formatting style for doubles (created automatically from the dbl_digits parameter)
 #' @param col_max_width maximum column width
-add_excel_sheet <- function(wb, sheet_name, ..., dbl_digits = 2, col_max_width = 75) {
+add_excel_sheet <- function(wb, sheet_name, ..., dbl_digits = 2, col_max_width = 75, int_format = "0", dbl_format = sprintf(sprintf("%%.%df", dbl_digits), 0)) {
   
   # sheet
   openxlsx::addWorksheet(wb, sheet_name)
@@ -99,13 +99,12 @@ add_excel_sheet <- function(wb, sheet_name, ..., dbl_digits = 2, col_max_width =
       # integer column formatting
       if (length(int_cols) > 0) {
         openxlsx::addStyle(
-          wb, sheet_name, style = openxlsx::createStyle(numFmt = "0"),
+          wb, sheet_name, style = openxlsx::createStyle(numFmt = int_format),
           rows = (start_row + 1L):(start_row + 1L + nrow(sheet_data)),
           cols = int_cols, gridExpand = TRUE)
       }
       # double column formatting
       if (length(dbl_cols) > 0) {
-        dbl_format <- paste0("0.", paste(rep("0", dbl_digits), collapse = ""))
         openxlsx::addStyle(
           wb, sheet_name, style = openxlsx::createStyle(numFmt = dbl_format),
           rows = (start_row + 1L):(start_row + 1L + nrow(sheet_data)),

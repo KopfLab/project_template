@@ -1,4 +1,4 @@
-# data raw
+# data
 
 This directory should hold all of your raw data files, no matter the format (e.g. Excel, CSV, image data, etc.). Use subfolders to structure your data further if you have a lot of differeny kinds. All data files should be treated as **read only**.
 

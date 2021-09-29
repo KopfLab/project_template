@@ -1,6 +1,6 @@
 # GIT ignore commands for the entire project
 
-# exclude output files
+# exclude all output files and folders by default
 *.rds
 *.rda
 *.pdf
@@ -12,9 +12,12 @@
 *.docx
 *.xlsx
 *.csv
+*cache/**/*
+output/**/*
+plots/**/*
 
-# explicitly allow all files in data_raw (by default)
-!data_raw/**/*
+# explicitly allow all files in data (by default)
+!data/**/*
 
 # allow all files in documents (by default)
 !documents/**/*
@@ -53,6 +56,4 @@ packrat/src/
 
 # exclude authentication tokens
 .httr-oauth
-
-# exclude cache
-*cache/*
+*.json
