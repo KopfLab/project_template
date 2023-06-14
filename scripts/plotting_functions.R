@@ -14,7 +14,7 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
   the_theme <- theme_bw() + 
     theme(text = element_text(size = text_size),
           plot.background = element_blank(), panel.background = element_blank(),
-          panel.border = element_rect(color="black", size=1), 
+          panel.border = element_rect(color="black", linewidth = 1), 
           strip.background = element_rect(color="black", linetype = 1),
           plot.margin = unit(plot_margin, "mm")
     )
