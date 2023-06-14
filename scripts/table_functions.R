@@ -1,45 +1,5 @@
-#' Format number with decimals
-#' This is useful for including numbers on plots as text elements.
-#' 
-#' @param decimals number of decimals to display (vectorized)
-#' @param error +/- errors vector to include (if NULL no error included)
-#' @param error_sep separator for value and error, only relevant if errors provided
-#' @param include_plus whether to include plus sign for positive numbers (x>0)
-#' @param na_value what value to use for NA values
-#' @return textual representation of the number matching the parameter settings
-format_with_decimals <- function(x, decimals, error = NULL, error_sep = " \U00B1 ", include_plus = FALSE, na_value = NA_character_) {
-  # safety checks
-  if (missing(decimals)) stop("no number of decimals specified", call. = FALSE)
-  if (length(decimals) == 1) {
-    decimals <- rep(decimals, length(x))
-  } else if (length(decimals) != length(x)) {
-    stop("decimals vector needs to be the same length as x vector", call. = FALSE)
-  } else if (any(is.na(decimals[!is.na(x)]))) {
-    stop("decimals not provided for all non-na x values", call. = FALSE)
-  }
-  if (length(error) > 0 && length(error) != length(x)) {
-    stop("if provided, errors vector needs to be the same length as x vector", call. = FALSE)
-  } else if (length(error) > 0 && any(is.na(error[!is.na(x)]))) {
-    stop("errors not provided for all non-na x values", call. = FALSE)
-  }
-  # determine formatting
-  plus <- if(include_plus) "+" else ""
-  # generate output vector
-  out <- character(length(x))
-  out[is.na(x)] <- na_value
-  # formatting
-  if (length(error) > 0)
-    out[!is.na(x)] <- sprintf(
-      sprintf("%%%s.%0.ff%s%%.%0.ff", plus, decimals[!is.na(x)], error_sep, decimals[!is.na(x)]), 
-      x[!is.na(x)], error[!is.na(x)]
-    )
-  else
-    out[!is.na(x)] <- sprintf(sprintf("%%%s.%0.ff", plus, decimals[!is.na(x)]), x[!is.na(x)])
-  # finished
-  return(out)
-}
-
 #' Format number with significant digits
+#' 
 #' This is useful for including numbers on plots as text elements.
 #' 
 #' @param signif number of significant digits to display
@@ -51,30 +11,6 @@ format_with_decimals <- function(x, decimals, error = NULL, error_sep = " \U00B1
 #' @param na_value what value to use for NA values
 #' @return textual representation of the number matching the parameter settings
 format_with_signif <- function(x, signif = 2, no_sci_min = 1e-5, no_sci_max = 1e5, always_sci = FALSE, sci_as_latex = FALSE, include_plus = FALSE, na_value = NA_character_) {
-  n_min_decimals <- find_signif_decimals(x = x, signif = signif, full = FALSE)
-  # determine formatting
-  plus <- if(include_plus) "+" else ""
-  pow <- if(sci_as_latex) "\\\\cdot{}10^{%.0f}" else "e%.0f"
-  # generate output vector
-  out <- character(length(x))
-  out[is.na(x)] <- na_value
-  # non-sci formatting
-  non_sci <- !is.na(x) & !always_sci & abs(x) > no_sci_min & abs(x) < no_sci_max 
-  out[non_sci] <- sprintf(sprintf("%%%s.%0.ff", plus, n_min_decimals[non_sci] + signif - 1L), x[non_sci])
-  # sci formatting
-  sci <- !is.na(x) & !non_sci
-  out[sci] <- sprintf(sprintf("%%%s.%0.ff%s", plus, signif - 1L, pow), x[sci] * 10^(n_min_decimals[sci]), -n_min_decimals[sci])
-  # finished
-  return(out)
-}
-
-#' Calculate the number of decimals from significant digits
-#' 
-#' This is useful for determining decimals for errors based on the signifs of a value (or vice versa).
-#' 
-#' @param signif number of significant digits to display
-#' @param full if TRUE provides the maximum number of decimals for standard formatting (default) if FALSE provides the minimum number (i.e. decimal of the first digit)
-find_signif_decimals <- function(x, signif = 2, full = TRUE) {
   if(signif <= 0) stop("this function only supports numbers with at least 1 significant digit")
   x <- base::signif(x, digits = signif)
   n_decimals = ifelse(x == 0, 0, log10(abs(x)))
@@ -88,10 +24,20 @@ find_signif_decimals <- function(x, signif = 2, full = TRUE) {
     min_decimals <- min(n_decimals[!zeros], na.rm = TRUE)
     n_decimals <- ifelse(zeros, min_decimals, n_decimals)
   }
-  if (full)
-    return(-n_decimals + signif - 1L)
-  else
-    return(-n_decimals)
+  # determine formatting
+  plus <- if(include_plus) "+" else ""
+  pow <- if(sci_as_latex) "\\\\cdot{}10^{%.0f}" else "e%.0f"
+  # generate output vector
+  out <- character(length(x))
+  out[is.na(x)] <- na_value
+  # non-sci formatting
+  non_sci <- !is.na(x) & !always_sci & abs(x) > no_sci_min & abs(x) < no_sci_max 
+  out[non_sci] <- sprintf(sprintf("%%%s.%0.ff", plus, -n_decimals[non_sci] + signif - 1L), x[non_sci])
+  # sci formatting
+  sci <- !is.na(x) & !non_sci
+  out[sci] <- sprintf(sprintf("%%%s.%0.ff%s", plus, signif - 1L, pow), x[sci] * 10^(-n_decimals[sci]), n_decimals[sci])
+  # finished
+  return(out)
 }
 
 #' export data frame to excel
