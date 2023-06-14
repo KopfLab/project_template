@@ -50,46 +50,56 @@ parsed_sci_format <- function(signif = 2, include_plus = FALSE) {
   }
 }
 
+#' Scientific log10 labeller
+#' 
+#' Nicely formatted labeller for log10 scales scale_y_log10(label = label_scientific_log())
+label_scientific_log <- function() {
+  parser1 <- scales::label_scientific()
+  parser2 <- scales::label_parse()
+  function(x) {
+    needs_decimal <- any((log10(na.omit(x)) %% 1) > 0)
+    if (needs_decimal) {
+      x |> 
+        parser1() |>
+        stringr::str_replace("e\\+?", " %.% 10^") |>
+        parser2() 
+    } else {
+      scales::label_log()(x)
+    }
+  }
+}
+
 #' Latex labeller
 #' 
 #' Latex labeller for ggplot that will interpret latex equations correctly (i.e. anything between $$). 
 #' Works for both the \code{labels} parameter of discrete ggplot2 scales as well as the \code{labeller} of facets.
-latex_labeller <- function(labels, ...) {
+label_latex <- function(multi_line = TRUE) {
   
-  require("dplyr")
-  require("tidyr")
-  require("purrr")
-  require("latex2exp")
+  fun <- function(labels, ...) {
+    # safe latex conversion
+    latex_to_expr <- function(x) {
+      purrr::map(x, ~{
+        if (is.na(.x)) NA_character_
+        else latex2exp::TeX(.x)
+      })
+    }
+    
+    # parse labels
+    if (is(labels, "data.frame")) {
+      labels <- labels |>
+        ggplot2::label_value(multi_line = multi_line) |>
+        purrr::map(latex_to_expr)
+    } else {
+      labels <- labels |>
+        latex_to_expr()
+    }
+    # return
+    return(labels)
+  }
   
-  # figure out if we're in a scale or facet labeller
-  facet_labels <- is(labels, "data.frame")
-  if (!facet_labels) labels <- tibble(..x.. = as.character(labels))
-  
-  # gather labels
-  labels <- labels %>% 
-    # add position info
-    mutate(pos = row_number()) %>% 
-    # gather labels
-    mutate_if(is.factor, as.character) %>% 
-    gather(var, val, -pos) %>% as_tibble() 
-  
-  # convert latex to expression
-  labels <- labels %>% 
-    mutate(
-      val = map(val, ~latex2exp::TeX(.x))
-    )
-  
-  # spread data frame again
-  labels <- labels %>% 
-    filter(!is.na(pos)) %>% 
-    spread(var, val) %>% 
-    select(-pos)
-  
-  # return appropriate value for labeller
-  if (facet_labels) return(labels)
-  else return(labels$..x..)
+  structure(fun, class = c("function", "labeller"))
 }
-class(latex_labeller) <- c("function", "labeller")
+
 
 #' Generate a regression fit label to show on plots
 #'

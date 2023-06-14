@@ -67,31 +67,38 @@ p1
 
 ## Latex labels
 
-```{r "polished_plot_w_latex_labels", warning=FALSE, fig.width = 6, fig.height = 8}
+```{r "polished_plot_w_latex_labels", warning=FALSE, fig.width = 6, fig.height = 6}
 # generate a more polished plot
-p2 <- mpg %>% 
+p2 <- mpg |>
   # upgrade the color scale to include some latex symbols
   mutate(
     latex_drv = 
       # turn into ordered variable (factor) that keeps the order
-      as_factor(drv) %>% fct_inorder() %>% 
+      as_factor(drv) |> 
       # introduce latex substitutions
       fct_recode(
         "$\\left(\\frac{\\textbf{rear drv}}{\\beta^2}\\right)$" = "r",
-        "$\\int_{\\infinity}\\sqrt[2]_{\\textbf{front drv}}$" = "f")
-  ) %>% 
+        "$\\int_{\\infinity}\\sqrt[2]_{\\textbf{front drv}}$" = "f"),
+    cyl_info = paste("cyl:", cyl) |> as_factor()
+  ) |>
   # start the plot
   ggplot() + 
   aes(x = hwy, y = cty, color = latex_drv) + 
   geom_point() +
   # add latex to color, facet and axis labels
-  scale_color_discrete(labels = latex_labeller) +
-  facet_wrap(~latex_drv, labeller = latex_labeller, ncol = 1) +
-  labs(x = TeX("my x axis $\\delta^{42}X\\,\\[\U2030\\]$")) + 
+  scale_color_discrete(labels = label_latex()) +
+  facet_wrap(~latex_drv, labeller = label_latex(), ncol = 1) +
+  labs(x = TeX("my x axis $\\delta^{42}X$ [\U2030]")) + 
   # use theme_figure from the plotting_functions.R
   theme_figure(text_size = 16)
 p2
 ```
+
+```{r "large_plot_w_latex_labels", warning=FALSE, fig.width = 8, fig.height = 10}
+# or with multi facets
+p2 + facet_wrap(~latex_drv + cyl_info, labeller = label_latex(multi_line = FALSE)) 
+```
+
 
 ## Regression labels
 
