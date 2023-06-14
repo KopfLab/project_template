@@ -38,6 +38,11 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
   return(the_theme)
 }
 
+#' Secondary permil axis
+sec_permil_axis <- function(...) {
+  dup_axis(labels = function(x) sprintf("%+0.f\U2030", (x-1) * 1000), name = NULL, ...)
+}
+
 #' Parse scientific notation formatter for plot axes
 #' @example 
 #' p + scale_y_continuous(labels = parsed_sci_format(signif = 3))
