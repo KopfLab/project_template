@@ -13,6 +13,9 @@
 #'   z_err = propagate_error((x-y)/(x+y)^2, dx = x_err, dy = y_err)
 #' )
 propagate_error <- function(eq, ..., quiet = FALSE) {
+  
+  require("rlang")
+  
   # expression, variables and error terms
   eq_quo <- enquo(eq)
   eq_expr <- quo_get_expr(eq_quo)
