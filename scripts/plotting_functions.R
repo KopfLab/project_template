@@ -43,18 +43,6 @@ sec_permil_axis <- function(...) {
   dup_axis(labels = function(x) sprintf("%+0.f\U2030", (x-1) * 1000), name = NULL, ...)
 }
 
-#' Parse scientific notation formatter for plot axes
-#' @example 
-#' p + scale_y_continuous(labels = parsed_sci_format(signif = 3))
-parsed_sci_format <- function(signif = 2, include_plus = FALSE) {
-  require("latex2exp")
-  function(x) {
-    tex_labels <- format_with_signif(x, signif = signif, always_sci = TRUE, sci_as_latex = TRUE, include_plus = include_plus)
-    tex_labels[is.na(tex_labels)] <- ""
-    latex2exp::TeX(tex_labels)
-  }
-}
-
 #' Scientific log10 labeller
 #' 
 #' Nicely formatted labeller for log10 scales scale_y_log10(label = label_scientific_log())
@@ -137,9 +125,9 @@ generate_regression_fit_label <- function(df, formula, func = lm, signif = 2, in
           mutate(
             term = str_remove_all(term, fixed("`")),
             x_term = case_when(
-              is.na(estimate) ~ sprintf("??\\cdot\\textit{%s}", term),
+              is.na(estimate) ~ sprintf("??\\cdot{}\\textit{%s}", term),
               term == "(Intercept)" ~ format_with_signif(estimate, signif = !!signif, sci_as_latex = TRUE, include_plus = TRUE),
-              TRUE ~ sprintf("%s\\cdot\\textit{%s}", format_with_signif(estimate, signif = signif, sci_as_latex = TRUE, include_plus = TRUE), term)
+              TRUE ~ sprintf("%s\\cdot{}\\textit{%s}", format_with_signif(estimate, signif = signif, sci_as_latex = TRUE, include_plus = TRUE), term)
             )
           )
       } else { NULL }),

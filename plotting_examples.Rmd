@@ -88,7 +88,10 @@ p2 <- mpg |>
   # add latex to color, facet and axis labels
   scale_color_discrete(labels = label_latex()) +
   facet_wrap(~latex_drv, labeller = label_latex(), ncol = 1) +
-  labs(x = TeX("my x axis $\\delta^{42}X$ [\U2030]")) + 
+  # FIXME: somethign broke about the encoding during knitting, it no longer 
+  # takes encoding = "WinAnsi" into consideration
+  #labs(x = TeX("my x axis $\\delta^{42}X$ [\U2030]")) + 
+  labs(x = TeX("my x axis $\\delta^{42}X$ [permil]")) + 
   # use theme_figure from the plotting_functions.R
   theme_figure(text_size = 16)
 p2
@@ -132,7 +135,7 @@ diamonds %>%
   ggplot() +
   aes(x = carat, y = price, color = cut) +
   geom_point() + 
-  scale_y_continuous(labels = parsed_sci_format(signif = 2)) +
+  scale_y_log10(label = label_scientific_log()) +
   theme_figure(text_size = 16)
 ```
 
