@@ -1,20 +1,20 @@
 # Plotting helper functions -------
 
 #' Figure Theme
-#' 
+#'
 #' Theme for figures with frequently used formatting instructions.
 #' @param legend whether to show the legend
 #' @param grid whether to show the grid
 #' @param plot_margin margins for c(top, right, bottom, left) in mm
-#' @param text_size font size for all text on plot 
+#' @param text_size font size for all text on plot
 #' @param axis_text_size font size for the axes' text (define only if different from text_size)
 #' @param axis_x_rotated whether to rotate the x axis labels
-theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1), 
+theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1),
                          text_size = 20, axis_text_size = NULL, axis_x_rotate = 0) {
-  the_theme <- theme_bw() + 
+  the_theme <- theme_bw() +
     theme(text = element_text(size = text_size),
           plot.background = element_blank(), panel.background = element_blank(),
-          panel.border = element_rect(color="black", linewidth = 1), 
+          panel.border = element_rect(color="black", linewidth = 1),
           strip.background = element_rect(color="black", linetype = 1),
           plot.margin = unit(plot_margin, "mm")
     )
@@ -28,11 +28,11 @@ theme_figure <- function(legend = TRUE, grid = TRUE, plot_margin = c(1, 1, 1, 1)
     the_theme <- the_theme + theme(legend.position = "none")
   # overwrite axis text size if provided
   if (!is.null(axis_text_size))
-    the_theme <- the_theme + 
-      theme(axis.text = element_text(size = axis_text_size)) 
+    the_theme <- the_theme +
+      theme(axis.text = element_text(size = axis_text_size))
   # axis rotation
   if (axis_x_rotate != 0) {
-    the_theme <- the_theme + 
+    the_theme <- the_theme +
       theme(axis.text.x = element_text(angle = axis_x_rotate, vjust = 0.5, hjust = 1))
   }
   return(the_theme)
@@ -44,30 +44,33 @@ sec_permil_axis <- function(...) {
 }
 
 #' Scientific log10 labeller
-#' 
+#'
 #' Nicely formatted labeller for log10 scales scale_y_log10(label = label_scientific_log())
 label_scientific_log <- function() {
   parser1 <- scales::label_scientific()
   parser2 <- scales::label_parse()
+  parser3 <- scales::label_log()
   function(x) {
     needs_decimal <- any((log10(na.omit(x)) %% 1) > 0)
     if (needs_decimal) {
-      x |> 
+      out <- x |>
         parser1() |>
         stringr::str_replace("e\\+?", " %.% 10^") |>
-        parser2() 
+        parser2()
     } else {
-      scales::label_log()(x)
+      out <- parser3(x)
     }
+    out[x == 0.0] <- 0
+    return(out)
   }
 }
 
 #' Latex labeller
-#' 
-#' Latex labeller for ggplot that will interpret latex equations correctly (i.e. anything between $$). 
+#'
+#' Latex labeller for ggplot that will interpret latex equations correctly (i.e. anything between $$).
 #' Works for both the \code{labels} parameter of discrete ggplot2 scales as well as the \code{labeller} of facets.
 label_latex <- function(multi_line = TRUE) {
-  
+
   fun <- function(labels, ...) {
     # safe latex conversion
     latex_to_expr <- function(x) {
@@ -76,7 +79,7 @@ label_latex <- function(multi_line = TRUE) {
         else latex2exp::TeX(.x)
       })
     }
-    
+
     # parse labels
     if (is(labels, "data.frame")) {
       labels <- labels |>
@@ -89,7 +92,7 @@ label_latex <- function(multi_line = TRUE) {
     # return
     return(labels)
   }
-  
+
   structure(fun, class = c("function", "labeller"))
 }
 
@@ -104,25 +107,22 @@ label_latex <- function(multi_line = TRUE) {
 #' @param terms_order_low_to_high whether to start with the intercept and go to higher order terms or vice versa (start with highest order term)
 #' @param ... additional parameters to the regression function
 generate_regression_fit_label <- function(df, formula, func = lm, signif = 2, include_r2 = TRUE, terms_order_low_to_high = FALSE, ...) {
-  require("dplyr")
-  require("broom")
-  require("latex2exp")
   if(missing(formula)) stop("need a formula", call. = FALSE)
   formula_expr <- rlang::enexpr(formula)
   safe_func <- safely(func)
   dots <- rlang::dots_list(...)
   df %>%
-    group_nest(.key = "reg_data") %>%
-    mutate(
-      fit = map(reg_data, ~safe_func(formula = !!formula_expr, data = .x, !!!dots)),
-      has_error = !map_lgl(fit, ~is.null(.x$error)),
-      error_msg = map2_chr(has_error, fit, ~if(.x) { as.character(.y$error) } else { NA_character_ } ),
-      adj_r2 = map2_dbl(has_error, fit, ~if(!.x) { broom::glance(.y$result)$adj.r.squared } else { NA_real_ } ),
-      coefs = map2(has_error, fit, ~if(!.x) { 
+    dplyr::group_nest(.key = "reg_data") %>%
+    dplyr::mutate(
+      fit = purrr::map(reg_data, ~safe_func(formula = !!formula_expr, data = .x, !!!dots)),
+      has_error = !purrr::map_lgl(fit, ~is.null(.x$error)),
+      error_msg = purrr::map2_chr(has_error, fit, ~if(.x) { as.character(.y$error) } else { NA_character_ } ),
+      adj_r2 = purrr::map2_dbl(has_error, fit, ~if(!.x) { broom::glance(.y$result)$adj.r.squared } else { NA_real_ } ),
+      coefs = purrr::map2(has_error, fit, ~if(!.x) {
         coeffs <- broom::tidy(.y$result)
         if (!terms_order_low_to_high) coeffs <- coeffs[nrow(coeffs):1,]
         coeffs %>%
-          mutate(
+          dplyr::mutate(
             term = str_remove_all(term, fixed("`")),
             x_term = case_when(
               is.na(estimate) ~ sprintf("??\\cdot{}\\textit{%s}", term),
@@ -132,15 +132,15 @@ generate_regression_fit_label <- function(df, formula, func = lm, signif = 2, in
           )
       } else { NULL }),
       y_term = sprintf("\\textit{%s}", rlang::as_label(rlang::f_lhs(!!formula_expr))),
-      x_term = map2_chr(has_error, coefs, ~if(!.x) { paste(.y$x_term, collapse = "\\,")  } else { NA_character_} ),
+      x_term = purrr::map2_chr(has_error, coefs, ~if(!.x) { paste(.y$x_term, collapse = "\\,")  } else { NA_character_} ),
       r2_term = if (include_r2) sprintf("\\,(\\textit{r}^2 = %s)", format_with_signif(adj_r2, signif = signif, sci_as_latex = TRUE)),
       latex_label = ifelse(
         has_error, NA_character_,
         sprintf("$%s\\,=\\,%s%s$", y_term, x_term, r2_term)
       ),
-      expr_label = map2_chr(latex_label, error_msg, ~as.character(latex2exp::TeX(if(!is.na(.x)) { .x } else { .y })))
+      expr_label = purrr::map2_chr(latex_label, error_msg, ~as.character(latex2exp::TeX(if(!is.na(.x)) { .x } else { .y })))
     ) %>%
-    select(-reg_data, -fit, -adj_r2, -coefs, -y_term, -x_term, -r2_term) 
+    dplyr::select(-reg_data, -fit, -adj_r2, -coefs, -y_term, -x_term, -r2_term)
 }
 
 #' @param pb_* bottom subplot parameters
@@ -152,7 +152,7 @@ plot_with_y_gap <- function(
 ) {
   force(xlab)
   pb$labels$x <- NULL
-  pt <- pt + coord_cartesian(ylim = pt_ylim) + 
+  pt <- pt + coord_cartesian(ylim = pt_ylim) +
     scale_y_continuous(NULL, expand = c(0, 0), breaks = pt_breaks, labels = pt_labels, sec.axis = sec_axis(~ .)) +
     theme(
       panel.border = element_blank(),
@@ -170,12 +170,12 @@ plot_with_y_gap <- function(
   position_scales <- map_lgl(pt$scales$scales, is, "ScaleContinuousPosition")
   x_aesthetics <- map_lgl(pt$scales$scales, ~any(.x$aesthetics == "x"))
   x_idx <- which(position_scales & x_aesthetics)
-  if (length(x_idx) > 0) 
+  if (length(x_idx) > 0)
     pt$scales$scales[[x_idx[1]]]$secondary.axis <- sec_axis(~ .)
   else
     pt <- pt + scale_x_continuous(sec.axis = sec_axis(~ .))
-  
-  pb <- pb + coord_cartesian(ylim = pb_ylim) + 
+
+  pb <- pb + coord_cartesian(ylim = pb_ylim) +
     scale_y_continuous(NULL, expand = c(0, 0), pb_breaks, labels = pb_labels, sec.axis = sec_axis(~ .)) +
     theme(
       panel.border = element_blank(),
@@ -189,18 +189,18 @@ plot_with_y_gap <- function(
       axis.text.x.top = element_blank(),
       axis.ticks.x.top = element_blank()
     )
-  
+
   # combined plots
   p <- cowplot::plot_grid(
     pt, pb, ncol = 1, align = "v", rel_heights = c(pt_relative_size, pb_relative_size)
   )
-  
+
   # add axis labels
   y_label_grob <- NULL
   x_label_grob <- NULL
   if (!is.null(ylab)) {
     y_label_grob <- grid::textGrob(ylab, gp = element_render(pb$theme, "axis.text.y")$children[[1]]$gp, rot=90)
-  } 
+  }
   if (!is.null(xlab)) {
     x_label_grob <- grid::textGrob(xlab, gp = element_render(pb$theme, "axis.text.x")$children[[1]]$gp)
   }
@@ -214,8 +214,8 @@ plot_with_y_gap <- function(
 #' @param width of markers (relative)
 element_y_axis_with_gap <- function(bottom_marker = NULL, top_marker = NULL, width = 0.5) {
   structure(
-    list(bottom_marker = bottom_marker, top_marker = top_marker, width = width), 
-    class = c("element_y_axis_with_gap","element_blank", "element") 
+    list(bottom_marker = bottom_marker, top_marker = top_marker, width = width),
+    class = c("element_y_axis_with_gap","element_blank", "element")
   )
 }
 
@@ -236,7 +236,7 @@ element_grob.element_y_axis_with_gap <- function(element, ...)  {
     top_offset <- 0
     top_grob <- NULL
   }
-  
+
   grid::gList(
     grid::segmentsGrob(x0 = 1, y0 = bottom_offset, x1 = 1, y1 = 1 - top_offset),
     bottom_grob,
