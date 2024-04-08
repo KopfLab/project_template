@@ -26,6 +26,16 @@ format:
     fig-dpi: 600
     execute:
       echo: false
+# knitr global chunk options
+knitr: 
+  opts_chunk: 
+    fig.path: "plots/"
+    fig.keep: "all"
+    dev: ['png', 'pdf']
+    dev.args: 
+      pdf: 
+        encoding: 'WinAnsi'
+        useDingbats: false
 # bibliography and cross-references
 bibliography: references.bib
 crossref:
@@ -51,13 +61,6 @@ library(tidyverse)
 
 # load scripts
 
-
-# global knitting options for code rendering
-knitr::opts_chunk$set(
-  dev = c("png", "pdf"), fig.keep = "all",
-  dev.args = list(pdf = list(encoding = "WinAnsi", useDingbats = FALSE)),
-  fig.path = sprintf("plots/%s_", gsub("\\.qmd", "", knitr::current_input()))
-)
 ```
 
 # Data
@@ -77,7 +80,7 @@ knitr::opts_chunk$set(
 ```{r}
 #| label: fig-example
 #| fig-cap: Miles per gallon in city vs. highway driving for different car types.
-#| fig-width: 7
+#| fig-width: 5
 #| fig-height: 3
 ggplot(mpg) + 
   aes(x = hwy, y = cty, color = class) +
